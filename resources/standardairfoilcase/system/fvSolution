@@ -1,0 +1,103 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.2                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "runConditions"
+
+solvers
+{
+    p
+    {
+        solver           GAMG;
+        tolerance        1e-20;
+        relTol           1e-1;
+        smoother         GaussSeidel;
+        nPreSweeps       0;
+        nPostSweeps      2;
+        cacheAgglomeration on;
+        agglomerator     faceAreaPair;
+        nCellsInCoarsestLevel 10;
+        mergeLevels      1;
+        minIter 3;
+        maxIter 50;
+    }
+
+    U
+    {
+        solver           PBiCG;
+        preconditioner   DILU;
+        tolerance        1e-20;
+        relTol           1e-1;
+        nSweeps          1;
+        minIter 3;
+    }
+
+    "(k|kl|kt|omega)"
+    {
+        solver           PBiCG;
+        preconditioner   DILU;
+        tolerance        1e-20;
+        relTol           1e-1;
+        nSweeps          1;
+        minIter 3;
+    }
+    
+    Phi
+    {
+        solver           GAMG;
+        smoother   GaussSeidel;
+        tolerance        1e-20;
+        relTol           1e-1;
+        maxIter 50;
+    }
+}
+
+potentialFlow
+{
+    nNonOrthogonalCorrectors 10;
+    PhiRefCell        0;
+    PhiRefValue       0;
+}
+
+SIMPLE
+{
+    nNonOrthogonalCorrectors 1;
+
+    residualControl
+    {
+        p               1e-8;
+        U               1e-8;
+        "(k|kt|kl|omega)"     1e-6;
+    }
+    
+    pRefPoint ($Rdomain 0 0);
+    pRefValue 0;
+}
+
+relaxationFactors
+{
+	p   0.3;
+	"(k|kt|kl|omega)"   0.3;
+	U	0.5;
+
+// will work with kOmegaSST but not kkLOmega
+/*
+	p   0.4;
+	"(k|kt|kl|omega)"   0.6;
+	U	0.6;
+*/
+}
+
+// ************************************************************************* //

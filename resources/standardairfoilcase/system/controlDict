@@ -1,0 +1,89 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.2                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "runConditions"
+
+application     simpleFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         25000;
+
+deltaT          1;
+
+writeControl    timeStep;
+
+writeInterval   5000;
+
+purgeWrite      2;
+
+writeFormat     binary;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+//stopAt writeNow;
+
+functions
+{
+	forceCoeffs
+	{
+		libs ("libforces.so"); // OF 5
+		functionObjectLibs ( "libforces.so" ); // OF3
+		
+		patches (foil);
+		type forceCoeffs;
+		
+		writeControl timeStep;
+		writeInterval 1;
+		
+		rho rhoInf; // OF 5
+		rhoInf $Density;
+		
+		pName       p; // OF 3
+		UName       U;
+		rhoName     rhoInf;
+		
+		log yes;
+		origin $CG;
+		
+		dragDir (1 0 0);
+		liftDir (0 1 0);
+		pitchAxis (0 0 1);
+		
+		magUInf $Umag;
+		lRef $Lref;
+		Aref $Aref;
+		
+		coordinateRotation
+		{
+			type EulerRotation;
+			rotation (0 0 0);
+		};
+	}
+}
+
+// ************************************************************************* //

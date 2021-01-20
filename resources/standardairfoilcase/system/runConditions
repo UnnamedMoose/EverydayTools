@@ -1,0 +1,38 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.0.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+// this file controls:
+// - initial conditions for turbulence modelling
+// - initial flow field and boundary condition values
+// - dynamic mesh properties, e.g. rate of rotation of the prop and
+// - geometric characteristics of the domain, the refinement regions and the AMI interface
+
+// -------------------
+// flow parameters
+Density 1.0;
+Umag 1.0;
+Viscosity 1.0E-6;
+
+// -------------------
+// inlet turbulence
+turbulentKE 6.0000E-4; // TI=2%
+turbulentOmega 0.45; // length scale=10%c
+
+// -------------------
+// for force and force coefficient calculation
+CG (0 0 0);
+Aref 1.0;
+Lref 1.0;
+
+// -------------------
+// other
+Rdomain 25.0;
+
+// ************************************************************************* //
+
+
