@@ -14,9 +14,9 @@ with open(os.path.join(os.getcwd(), 'VERSION'), encoding='utf-8') as version_fil
     ver=version_file.read().strip()
 
 setup(
-    name='EverydayTools',
+    name='everydaytools',
     version=ver, # Use the version from the file.
-	
+
     zip_safe= False,
 
     description='Tools for doing almost anything.',
