@@ -2,7 +2,7 @@
 # install with pip
 import pkg_resources as pkg
 try:
-	__version__ = pkg.get_distribution("pyMATT").version.lstrip('-').rstrip('-')
+	__version__ = pkg.get_distribution("EverydayTools").version.lstrip('-').rstrip('-')
 except:
 	__version__ = "unknown_version"
 
