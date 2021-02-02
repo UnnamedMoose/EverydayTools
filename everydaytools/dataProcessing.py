@@ -14,55 +14,55 @@ import yaml
 import pandas
 import os
 import re
-import matplotlib.pyplot as plt
 import datetime
 
-def readOverheadDynamometerFile(filename):
+
+def readOverheadDynamometerFile(filename, test=None):
     """ Reads fixed-format file with overhead dynamometry data from the
     RJ Mitchell wind tunnel at the University of Southampton.
     Compatibile with the readSeries function.
     """
-    
+
     with open(filename,"r") as f:
         s = f.read().split("\n")
-    
+
     metadata = {}
     data = []
     timeVals, dateVals = [], []
-    
+
     readingData = False
     nLinesRead = -1
     for l in s:
         if l.startswith("X_Value"):
             readingData = True
-            
+
         elif l.startswith("Date") and len(l.split()) > 2:
             dateVals = [int(v) for v in l.split()[1].split("/")]
-        
+
         elif l.startswith("Time") and len(l.split()) > 2:
             timeVals = [int(v) for v in l.split()[1].replace(".",":").split(":")]
-        
+
         elif readingData and len(l.strip()) > 0:
             nLinesRead += 1
             values = l.split()
-            
+
             if nLinesRead == 0:
                 # geat the metadata out from the first line
                 # Ambient(mmHg), Temperature, DynamicHead, Windspeed(m/s), Comment
                 metadata = dict(zip(["pInf", "Tinf", "dynHead", "Speed"],
                                     [float(v) for v in values[9:13]]))
                 metadata["comment"] = " ".join(values[13:])
-                
+
                 data = [[float(v) for v in values[:9]]]
             else:
                 # otherwise just read the values
                 data.append([float(v) for v in values[:9]])
-    
+
     data = np.array(data)
-    
+
     metadata["timestamp"] = datetime.datetime(dateVals[0], dateVals[1], dateVals[2], timeVals[0],
                              timeVals[1], timeVals[2], int(str(timeVals[3])[:6]))
-    
+
     return data, metadata
 
 def readMyDaqFile(filename):
@@ -72,33 +72,33 @@ def readMyDaqFile(filename):
     """
     with open(filename, "r") as f:
         s = f.read().split("\n")
-    
+
     nChannels = 0
     samplingRate = 0
     zeros = []
     names = []
     data = []
-    
+
     for l in s:
         if l:
             if l.startswith("No. channels"):
                 nChannels = int(l.split(":")[-1])
-            
+
             elif l.startswith("Sampling rate"):
                 samplingRate = float(l.split(":")[-1])
-                
+
             elif l.startswith("Zero"):
                 zeros = np.array([float(v) for v in l.split(":")[-1].split()])
-            
+
             elif l.startswith("Channel name"):
                 names = np.array(["Time"] + [v for v in l.split(":")[-1].split()])
-            
+
             else:
                 try:
                     data.append([float(v) for v in l.split()])
                 except ValueError:
                     pass
-    
+
     return pandas.DataFrame(data, columns=names), \
         {"nChannels":nChannels, "samplingRate":samplingRate, "zeros":zeros}
 
@@ -109,79 +109,79 @@ def readRawLassoFile(filename, scaleData=True):
     """
     with open(filename, "r") as f:
             s = f.readlines()
-        
+
     readingChannel = 0
     readingUserChannel = 0
     readingDataPoint = -1
-    
+
     for line in s:
         line = line.replace("\n","").replace("\r","")
-        
+
         if line.startswith("Sample rate"):
             sampleRate = float(line.split(":")[1])
-        
+
         # ---
         # metadata for each channel
         if line.startswith("Channels"):
             nChannels = int(line.split(":")[1])
-            
+
             names = [""]*nChannels
             units = [""]*nChannels
             rate = np.zeros(nChannels)
             zero = np.zeros(nChannels)
-            
+
             time = np.zeros(0)
             data = np.zeros((0, nChannels))
-            
+
         elif bool(re.match("Channel [0-9]+ data:", line)):
             readingChannel = int(line.split()[1])
-        
+
         elif readingChannel>0 and line.strip().startswith("Name"):
             names[readingChannel-1] = line.split(":")[1]
-        
+
         elif readingChannel>0 and line.strip().startswith("Units"):
             units[readingChannel-1] = line.split(":")[1]
-        
+
         elif readingChannel>0 and line.strip().startswith("Uzer Zero"):
             zero[readingChannel-1] = float(line.split(":")[1])
-        
+
         elif readingChannel>0 and line.strip().startswith("Rate"):
             rate[readingChannel-1] = float(line.split(":")[1])
-        
+
         # ---
         # user channels
         elif line.startswith("User Channels"):
             readingChannel = 0
             nUserChannels = int(line.split(":")[1])
-            
+
             userNames = [""]*nUserChannels
             userUnits = [""]*nUserChannels
             userValues = np.zeros(nUserChannels)
-        
+
         elif bool(re.match("User Channel [0-9]+ data:", line)):
             readingUserChannel = int(line.split()[2])
-        
+
         elif readingUserChannel>0 and line.strip().startswith("Name"):
             userNames[readingUserChannel-1] = line.split(":")[1]
-        
+
         elif readingUserChannel>0 and line.strip().startswith("Units"):
             userUnits[readingUserChannel-1] = line.split(":")[1]
-        
+
         elif readingUserChannel>0 and line.strip().startswith("Value"):
             userValues[readingUserChannel-1] = float(line.split(":")[1])
-        
+
         # ---
         # data
         elif line.startswith("The data"):
             maxInt = int(re.findall("[0-9]+", line)[0])
             readingUserChannel = 0
             readingDataPoint = 0
-        
+
         elif readingDataPoint>=0:
             time = np.append(time, readingDataPoint/sampleRate)
             data = np.vstack([data, [float(v) for v in line.split()]])
             readingDataPoint += 1
-    
+
     # scale the raw data
     if scaleData:
         for i in range(data.shape[1]):
@@ -198,7 +198,7 @@ def readRawLassoFile(filename, scaleData=True):
         "userUnits":userUnits,
         "userValues":userValues,
         }
-    
+
 #    return names, units, rate, zero, time, data, userNames, userUnits, userValues
     return df, metadata
 
@@ -206,52 +206,52 @@ def readSeries(series, dataDir, runDataImportFunction, dataFileExt="dat",
                statusPrintout=False, skipRuns=[]):
     """ Read a series of data described by a unique identifier from a specified
     directory using the provided import function that reads a single data file.
-    
+
     The funciton attempts to read metadata for the entire data series by assuming
     the name of the metadata file is 'series'+'_metadata.dat' and that said file
     is yaml-formatted. If this fails, an attempt is made to read
     'series'+'metadata.csv' using pandas. This file may be omitted without affecting
     this function's workflow.
-    
+
     It is assumed that each data file contains the name of the series and a run
     number defined as '_run[0-9]+' or '_Run_[0-9]+', with additional identifiers
     allowed. The import function may return either only the data as an arbitrary
     array/list/dataFrame type, or a tuple of data and a dictionary with
     additional information specific to each run.
     """
-    
+
     # get all files at the location and filter
     # TODO there must be a better and more general way with regexes...
     files = [f for f in os.listdir(dataDir) if ((series in f) and (("run" in f) or ("Run" in f)) \
                and (dataFileExt in f) and (series==f.split("_run")[0] or series==f.split("_Run")[0]))]
-    
+
     # attempt to read metadata
     try:
         with open(os.path.join(dataDir, "{}_metadata.dat".format(series)), "r") as inStream:
             metadata = yaml.load(inStream)
         if statusPrintout:
             print("Read metadata from YAML file")
-    
+
     except IOError:
         try:
             metadata = pandas.read_csv(os.path.join(dataDir, "{}_metadata.csv".format(series)))
             if statusPrintout:
                 print("Read metadata from csv file")
-        
+
         except IOError:
             print ("Metadata not found for series {}!".format(series))
             metadata = {}
-    
+
     # read data for each run
     data, runMetadata = {}, {}
     for f in files:
         run = int(re.findall("[0-9]+", re.findall("run[_]?[0-9]+", f, flags=re.IGNORECASE)[0] )[0])
-    
+
         if run in skipRuns:
             continue
-    
+
         returnValues = runDataImportFunction(os.path.join(dataDir, f))
-        
+
         if len(returnValues) == 1:
             data[run], runMetadata[run] = returnValues[0], {}
         elif len(returnValues) == 2:
@@ -260,10 +260,10 @@ def readSeries(series, dataDir, runDataImportFunction, dataFileExt="dat",
             data[run], runMetadata[run] = returnValues, {}
         else:
             raise IOError("Import function returned invalid data!")
-        
+
         if statusPrintout:
             print("Read run data for run {:d}".format(run))
-    
+
     return metadata, data, runMetadata
 
 def fitLinearTrends(x, y):
@@ -275,13 +275,13 @@ def fitLinearTrends(x, y):
         x.shape
     except AttributeError:
         x = np.array(x)
-    
+
     try:
         # check if the independent data is a numpy array and is in column-wise
         # orientation for each series of data
         if y.shape[1] == len(x):
             y = y.T
-        
+
     except AttributeError:
         # assume that the independent values are a list of vectors if it's not
         # a numpy array
@@ -291,7 +291,7 @@ def fitLinearTrends(x, y):
     for i in range(y.shape[1]):
         coeff, _, _, _ = np.linalg.lstsq(x[:,np.newaxis], y[:,i])
         coeffs[i] = coeff[0]
-    
+
     return coeffs
 
 def zeroDataSeries(y, t, parallelArrs = []):
@@ -300,34 +300,34 @@ def zeroDataSeries(y, t, parallelArrs = []):
     readings (Nrecords, Nvar) and 1D (Nrecords,) array of time stamps in datetime.datetime format.
     Returns the same variables.
     Also allows a list of parallel arrays to be sorted with the main ones. """
-    
+
     if type(y) == list:
         y = np.array(y)
-    
+
     if len(y.shape)<2:
         y = y[:, np.newaxis]
-    
+
     if y.shape[1] > y.shape[0]:
         y = np.transpose(y)
-    
+
     # sort with the time stamps (should be in chronological order but just to be safe)
     sortedI = np.argsort(t)
     t = np.array(t)[sortedI]
     y = np.array(y)[sortedI,:]
     for i in range(len(parallelArrs)):
         parallelArrs[i] = np.array(parallelArrs[i])[sortedI]
-    
+
     # calculate the drift rate, assuming first and last elements are zero records
     driftRate = (y[-1,:] - y[0,:]) / (t[-1] - t[0]).total_seconds()
-    
+
     # weightings for each datapoint
     weights = np.array([(v-t[0]).total_seconds() for v in t])
-    
+
     # correct
     y -= y[0,:]
     for i in range(y.shape[1]):
         y[:,i] -= driftRate[i]*weights
-    
+
     if len(parallelArrs)==0:
         return y, t
     else:
@@ -342,12 +342,12 @@ def groupData(x, y, epsilon):
     """
     if len(y.shape)<2:
         y = y[:,np.newaxis]
-    
+
     bins = np.zeros(x.shape)-1
     binPts = []
     binx = []
     biny = np.zeros((0,y.shape[1]))
-    
+
     binIndex = -1
     # if there is any point with unassigned bin then keep going
     while np.any(bins<0):
@@ -355,15 +355,15 @@ def groupData(x, y, epsilon):
         binIndex += 1
         # find the first point with unassigned bin
         for j in range(bins.shape[0]):
-            
+
             # start a new bin
             if bins[j] < 0:
                 bins[j] = binIndex
                 binPts.append([j])
-                
+
                 binx = np.append(binx, x[j])
                 biny = np.append(biny, y[j,:][np.newaxis,:], axis=0)
-                
+
                 # check all remaining points to see if they belong to this point
                 for i in range(bins.shape[0]):
                     # if this point doesn't have the bin and is within epsilon
@@ -374,7 +374,7 @@ def groupData(x, y, epsilon):
                         # update the mean values for this bin
                         binx[-1] = np.mean(x[binPts[-1]])
                         biny[-1,:] = np.mean(y[binPts[-1],:], axis=0)
-    
+
     # sort
     iSorted = np.argsort(binx)
     return binx[iSorted], biny[iSorted,:]
@@ -383,39 +383,39 @@ if __name__ == "__main__":
     pass
 #    import sys
 #    import platform
-#    
+#
 #    if platform.system() == "Windows":
 #        sys.path.append("C:\\Users\\artur\\Dropbox\\Python\\utilities\\")
 #    else:
 #        sys.path.append("/home/artur/Dropbox/Python/utilities/")
-#    
+#
 #    import nicePlots
 
     # UNIT TEST 0 - file import
     #filename = "C:/Users/artur/Documents/MATLAB/dataAcquisition/MyDaq1.dat"
     #nCh, rate, zeros, data = readFile(filename)
-    
+
     # UNIT TEST 1 - series import
     #dataDir = "C:/Users/artur/Documents/MATLAB/dataAcquisition/testData_calibration"
     #series = "series0_thrustCalibration"
     #importFunction = readFile
     #metadata, data, runMetadata = readSeries(series, dataDir, readFile)
-    
+
     # UNIT TEST 2 - calibration
     """
     dataDir = "C:/Users/artur/Documents/MATLAB/dataAcquisition/testData_calibration"
     series = "series0_thrustCalibration"
     importFunction = readFile
     metadata, data, runMetadata = readSeries(series, dataDir, readFile)
-    
+
     yT, yM = [], []
     for run in data:
         yT = np.append(yT, np.mean(data[run]["ai0"].values + data[run]["ai1"]))
         yM = np.append(yM, np.mean(data[run]["ai0"].values - data[run]["ai1"])*metadata["loadCellSeparation"]/2.)
-    
+
     xp = np.linspace(np.min(metadata["weights"]), np.max(metadata["weights"]), 101)
     slopes = fitLinearTrends(metadata["weights"], np.array([yT, yM]).T)
-    
+
     fig, ax = nicePlots.niceFig([], [], "Weight [N]", "Reading [V]")
     ax.plot(metadata["weights"], yT, "kp", label=r"$Thrust$",
             ms=9, markeredgewidth=3, markerfacecolor="None")
@@ -424,6 +424,6 @@ if __name__ == "__main__":
     ax.plot(xp, xp*slopes[0], "k--", label=r"$y_T={:.5f}x$".format(slopes[0]), lw=2)
     ax.plot(xp, xp*slopes[1], "k-.", label=r"$y_M={:.5f}x$".format(slopes[1]), lw=2)
     ax.legend(loc="best", prop={"size":18})
-    
+
     plt.show()
     """
