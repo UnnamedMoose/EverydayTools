@@ -231,10 +231,10 @@ def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], yli
 	
 	return ret
 
-def addColourBar(fig, cs, cbarLabel, pos=[0.85, .25, 0.03, 0.5], fontsize=20):
+def addColourBar(fig, cs, cbarLabel, pos=[0.85, .25, 0.03, 0.5], fontsize=20, orientation="vertical"):
 	""" Add a nice colour bar """
 	position = fig.add_axes(pos)#[0.85, .25, 0.03, 0.5])
-	cbar = fig.colorbar(cs, cax=position)
+	cbar = fig.colorbar(cs, cax=position, orientation=orientation)
 #		cbar.ax.tick_params(labelsize=16)
 	for label in cbar.ax.get_xticklabels():
 		label.set_fontproperties(tickFontProperties)
