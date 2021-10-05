@@ -16,3 +16,4 @@ from . import OpenFOAMiO # TODO needs a complete overhaul...
 from . import stlToolbox # TODO okay but very old and could be done a lot better
 from . import tecPlotIO
 from . import ReFRESCOiO # TODO very basic (only one file type); but rest can be done with standard TecPlot, usually
+from . import scripting
