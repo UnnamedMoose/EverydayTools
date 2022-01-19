@@ -9,6 +9,6 @@ In order to install:
     - Windows: Open Anaconda Command prompt.
     - Linux: Open terminal.
 3. Navigate to the source directory.
-4. Run: ```python setup.py install```.
+4. Run: ```python setup.py install```. Note: if you don't have root/admin privileges, use the ```--user``` option.
 5. Open a new Python interpreter and test the installation:
     ```import everydaytools```
