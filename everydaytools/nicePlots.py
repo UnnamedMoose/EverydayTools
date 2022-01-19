@@ -17,7 +17,7 @@ Created on Wed Jan 20 15:28:06 2016
 import matplotlib
 import matplotlib.pyplot as plt
 
-matplotlib.style.use("classic")
+#matplotlib.style.use("classic")
 
 def getColours(N, cmap="jet"):
 	""" Returns a list of N colours spanning evenly across the colour map (default jet - blue-green-red) """
@@ -137,7 +137,7 @@ def makeAxesNice(fig, ax, xlab='', ylab='', figtitle='', zlab="",
 		ax.w_zaxis._axinfo.update({'grid' : {'color': (0, 0, 0, 0.5), "linewidth": 0.5, 'linestyle': "--"}})
 
 def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], ylim=[],
-			style='bw', marginL=0.125, marginR=0.96, marginT=0.91, marginB=0.16, ncol=1, figSize=(8,6),
+			style='bw', marginL=0.125, marginR=0.96, marginT=0.91, marginB=0.16, ncol=1, figSize=None,
 			fontsizeLabels=20, fontsizeTicks=16, fontsizeLegend=18, rightAndTopBorder=False,
 			legbox=[], legloc="best", returnTwinAxes=False, twinYlabel='', returnCmap=False, colours=None):
 	""" Create a nice figure """
@@ -148,7 +148,10 @@ def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], yli
 
 	lineStyles = ['-','--','-.',':']
 
-	fig, ax = plt.subplots(1, figsize=figSize)
+    if figSize is not None:
+    	fig, ax = plt.subplots(1, figsize=figSize)
+    else:
+        fig, ax = plt.subplots(1)
 	if len(figtitle)>0:
 		fig.canvas.set_window_title(figtitle)
 
