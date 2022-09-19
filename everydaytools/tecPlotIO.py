@@ -13,11 +13,11 @@ import copy
 def _getZoneData(line):
 	""" Extract TecPlot formatted zone data from a line, return as two lists of
 	keys and matching values.
-	
+
 	Attributes
 	----------
 	* ``line`` (`string`): string representation of a line in a TecPlot file
-	
+
 	Returns
 	----------
 	* `list` with all the names of zone properties (sizes, SOLUTIONTIME, etc.)
@@ -33,17 +33,17 @@ def _getZoneData(line):
 
 def readTecPlot(filename, getZoneProperties=False):
 	""" Read a text-formatted TecPlot data file.
-	
+
 	By default return each zone as a pandas DataFrame and ignore zone properties
 	Each zone is stored as an object inside a dict, but if only a single zone is
 	present in the file, a DataFrame instance only is returned.
-	
+
 	Attributes
 	----------
 	* ``filename`` (`string`): path to the file to read and parse.
 	* ``getZoneProperties`` (`bool`, optional): whether or not to return all
 		the zone properties or just values themselves.
-	
+
 	Returns
 	----------
 	* `dict` of :class:`pandas.core.frame.DataFrame` containing data of each zone
@@ -66,8 +66,8 @@ def readTecPlot(filename, getZoneProperties=False):
 	# go over each line
 	for l in s:
 		if ((len(l.strip()) == 0) or (l[0] == '#')):
-		  continue  
-	  
+		  continue
+
 		# if found a variables definition
 		if ("variables" in l) or ("VARIABLES" in l):
 			# safeguard against other information being in the same line as variables
@@ -93,7 +93,7 @@ def readTecPlot(filename, getZoneProperties=False):
 					vals.pop(i)
 					keys.pop(i)
 					break
-			
+
 			# Safeguard against empty zone names. Use index in the file instead.
 			if newZone == "":
 				newZone = len(data)
@@ -152,3 +152,6 @@ def readTecPlot(filename, getZoneProperties=False):
 	else:
 		return data
 
+if __name__ == "__main__":
+    filename = 'D:\\cavitationInceptionNoise_DMO\\calcs/case_lpt_7_modDist_DII_-2.0_25_300_volFrac_1e-6/bubbleInducedNoise.dat'
+    data, props = readTecPlot(filename, getZoneProperties=True)

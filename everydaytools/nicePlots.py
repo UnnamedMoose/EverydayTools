@@ -87,15 +87,15 @@ def makeAxesNice(fig, ax, xlab='', ylab='', figtitle='', zlab="",
     fig.patch.set_facecolor("white")
 
     if len(xlab)>0:
-        ax.set_xlabel(r'${}$'.format(xlab.replace(' ','\,')), fontsize=20)
+        ax.set_xlabel(r'${}$'.format(xlab.replace(' ','\;')), fontsize=20)
         if xLabPad:
             ax.xaxis.labelpad = xLabPad
     if len(ylab)>0:
-        ax.set_ylabel(r'${}$'.format(ylab.replace(' ','\,')), fontsize=20)
+        ax.set_ylabel(r'${}$'.format(ylab.replace(' ','\;')), fontsize=20)
         if yLabPad:
             ax.yaxis.labelpad = yLabPad
     if len(zlab)>0:
-        ax.set_zlabel(r'${}$'.format(zlab.replace(' ','\,')), fontsize=20)
+        ax.set_zlabel(r'${}$'.format(zlab.replace(' ','\;')), fontsize=20)
         if zLabPad:
             ax.zaxis.labelpad = zLabPad
 
@@ -166,8 +166,8 @@ def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], yli
 
     fig.subplots_adjust(left=marginL, right=marginR, top=marginT, bottom=marginB, hspace=0.2)
 
-    ax.set_xlabel(r'${}$'.format(xlab.replace(' ','\,')),fontsize=fontsizeLabels)
-    ax.set_ylabel(r'${}$'.format(ylab.replace(' ','\,')),fontsize=fontsizeLabels)
+    ax.set_xlabel(r'${}$'.format(xlab.replace(' ','\;')),fontsize=fontsizeLabels)
+    ax.set_ylabel(r'${}$'.format(ylab.replace(' ','\;')),fontsize=fontsizeLabels)
 
 #    tickFontProperties = matplotlib.font_manager.FontProperties(family='serif',
 #                      style='normal',weight='normal',size=fontsizeTicks)
@@ -188,10 +188,10 @@ def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], yli
 
     if len(labels)>1:
         if len(legbox)==0:
-            legend = ax.legend(lns,[r'${}$'.format(l.replace(' ','\,')) for l in labels],
+            legend = ax.legend(lns,[r'${}$'.format(l.replace(' ','\;')) for l in labels],
                     ncol=ncol,prop={'size':fontsizeLegend},loc=legloc)
         else:
-            legend = ax.legend(lns,[r'${}$'.format(l.replace(' ','\,')) for l in labels],
+            legend = ax.legend(lns,[r'${}$'.format(l.replace(' ','\;')) for l in labels],
                     ncol=ncol,prop={'size':fontsizeLegend},bbox_to_anchor=legbox)
 
         legend.get_frame().set_linewidth(2)
@@ -212,7 +212,7 @@ def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], yli
         for label in ax2.get_yticklabels() :
             label.set_fontproperties(tickFontProperties)
 
-        ax2.set_ylabel(r'${}$'.format(twinYlabel.replace(' ','\,')),fontsize=fontsizeLabels)
+        ax2.set_ylabel(r'${}$'.format(twinYlabel.replace(' ','\;')),fontsize=fontsizeLabels)
 
     if not rightAndTopBorder:
         if returnTwinAxes:
