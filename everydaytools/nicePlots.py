@@ -67,7 +67,11 @@ def makeAxesNice(fig, ax, xlab='', ylab='', figtitle='', zlab="",
 
     # set title
     if len(figtitle)>0:
-        fig.canvas.set_window_title(figtitle)
+        try:
+            fig.canvas.set_window_title(figtitle)
+        except AttributeError:
+            # Cute how new matplotlib (3.6) dropped pep-8 convention
+            fig.canvas.setWindowTitle(figtitle)
     try:
         ax.tick_params(axis='both', reset=False, which='both', length=5, width=2)
     except KeyError:
@@ -153,7 +157,11 @@ def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], yli
     else:
         fig, ax = plt.subplots(1)
     if len(figtitle)>0:
-        fig.canvas.set_window_title(figtitle)
+        try:
+            fig.canvas.set_window_title(figtitle)
+        except AttributeError:
+            # Cute how new matplotlib (3.6) dropped pep-8 convention
+            fig.canvas.setWindowTitle(figtitle)
 
     ax.tick_params(axis='both',reset=False,which='both',length=5,width=2)
     ax.tick_params(axis='y', direction='out', which="both")
@@ -245,7 +253,7 @@ def addColourBar(fig, cs, cbarLabel, pos=[0.85, .25, 0.03, 0.5], fontsize=20, or
         label.set_fontproperties(tickFontProperties)
     for label in cbar.ax.get_yticklabels():
         label.set_fontproperties(tickFontProperties)
-    cbar.set_label("${}$".format(cbarLabel), fontsize=fontsize)
+    cbar.set_label("${}$".format(cbarLabel.replace(" ", "\;")), fontsize=fontsize)
     return cbar
 
 # =======
