@@ -1,4 +1,4 @@
-""" A setuptools-based setup module for my EverydayTools.
+""" A setuptools-based setup module for my everydaytools.
 """
 from setuptools import setup, find_packages
 # To use a consistent encoding
@@ -17,7 +17,7 @@ setup(
     name='everydaytools',
     version=ver, # Use the version from the file.
 
-    zip_safe= False,
+    # zip_safe= False,
 
     description='Tools for doing almost anything.',
     long_description=long_description, # From the README.md
