@@ -70,8 +70,7 @@ def makeAxesNice(fig, ax, xlab='', ylab='', figtitle='', zlab="",
         try:
             fig.canvas.set_window_title(figtitle)
         except AttributeError:
-            # Cute how new matplotlib (3.6) dropped pep-8 convention
-            fig.canvas.setWindowTitle(figtitle)
+            fig.canvas.manager.set_window_title(figtitle)
     try:
         ax.tick_params(axis='both', reset=False, which='both', length=5, width=2)
     except KeyError:
@@ -160,8 +159,7 @@ def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], yli
         try:
             fig.canvas.set_window_title(figtitle)
         except AttributeError:
-            # Cute how new matplotlib (3.6) dropped pep-8 convention
-            fig.canvas.setWindowTitle(figtitle)
+            fig.canvas.manager.set_window_title(figtitle)
 
     ax.tick_params(axis='both',reset=False,which='both',length=5,width=2)
     ax.tick_params(axis='y', direction='out', which="both")
