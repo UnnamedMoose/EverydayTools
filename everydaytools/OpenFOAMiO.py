@@ -13,24 +13,24 @@ for further manipulaiton and plotting
 # Python-specific files
 import sys
 import numpy as np
-import imp
+# import imp
 import re
 import warnings
 import os
 
 try:
-    imp.find_module('pandas')
-    PANDAS_FOUND = True
+    # imp.find_module('pandas')
     from pandas import read_csv
-except ImportError:
+    PANDAS_FOUND = True
+except ModuleNotFoundError:
     PANDAS_FOUND = False
 #    print('\n WARNING in OpenFOAMiO: pandas module not found, using slower importing functions ... \n')
 
 try:
-    imp.find_module('vtk')
-    VTK_FOUND = True
+    # imp.find_module('vtk')
     import vtk
-except ImportError:
+    VTK_FOUND = True
+except ModuleNotFoundError:
     VTK_FOUND = False
 #    print('\n WARNING in OpenFOAMiO: vtk module not found ... \n')
 
