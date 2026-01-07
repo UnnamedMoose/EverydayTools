@@ -1,5 +1,0 @@
-#!/bin/bash
-
-cp -r 0.org 0
-potentialFoam
-simpleFoam > log.run
