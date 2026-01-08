@@ -5,9 +5,6 @@ Created on Thu Jan  3 13:25:06 2019
 @author: Artur Lidtke (alidtke@marin.nl)
 """
 
-# because we live in a Python-3 world now
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import numpy as np
 import subprocess
 import sys
