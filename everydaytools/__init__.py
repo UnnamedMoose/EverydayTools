@@ -18,3 +18,4 @@ from . import tecPlotIO
 from . import ReFRESCOiO # TODO very basic (only one file type); but rest can be done with standard TecPlot, usually. pymatt has a much better interface
 from . import scripting
 from . import vrmlToolbox
+from . import hexpressTools
