@@ -1,41 +1,59 @@
-
-#!/usr/bin/env python
-
 # -*- coding: utf-8 -*-
-
-"""
-Copyright by Artur K. Lidtke, Univ. of Southampton, UK, 2014
-
-This code is distributed under GNU Lesser General Public Licence Agreement
-version 3 or newer and without any warranty of merchantability or suitability
-for any particular or general purpose.
-Please see http://www.gnu.org/licenses/lgpl.html for details.
-
-Created on Wed Jan 20 15:28:06 2016
-"""
-
 import matplotlib
 import matplotlib.pyplot as plt
 
-#matplotlib.style.use("classic")
+markers = ['d', 'p', 's', 'v', 'o', '8', '^', 'D', '*', 'h', '<', 'H', '>', '+']*3
 
+tickFontProperties = matplotlib.font_manager.FontProperties(
+    family='serif',
+    style='normal',
+    weight='normal',
+    size=16
+)
+
+
+def makeNiceAxes(ax, xlab=None, ylab=None):
+    ax.tick_params(axis='both', reset=False, which='both', length=5, width=2)
+    ax.tick_params(axis='y', direction='out', which="both")
+    ax.tick_params(axis='x', direction='out', which="both")
+    for spine in ['top', 'right','bottom','left']:
+        ax.spines[spine].set_linewidth(2)
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.set_xlabel(xlab)
+    ax.set_ylabel(ylab)
+    
+
+def niceFig(xlab=None, ylab=None, figsize=None, nrows=1, ncols=1):
+    fig, ax = plt.subplots(nrows, ncols, figsize=figsize)
+    if (nrows == 1) and (ncols == 1):
+        makeNiceAxes(ax, xlab, ylab)
+    else:
+        for axx in ax:
+            makeNiceAxes(axx, xlab, ylab)
+    return fig, ax
+
+
+def addColourBar(fig, cs, cbarLabel, pos=[0.85, 0.25, 0.03, 0.5], orientation="vertical"):
+    position = fig.add_axes(pos)
+    cbar = fig.colorbar(cs, cax=position, orientation=orientation)
+    cbar.set_label(cbarLabel)
+    return cbar
+
+
+# TODO the code below is deprecated but contains some useful bits. Might pick them up in the future.
+"""
 def getColours(N, cmap="jet"):
-    """ Returns a list of N colours spanning evenly across the colour map (default jet - blue-green-red) """
     cm = matplotlib.pyplot.cm.get_cmap(cmap)
     cNorm  = matplotlib.colors.Normalize(vmin=0, vmax=N-1)
     colourMapRGB = matplotlib.cm.ScalarMappable(norm=cNorm, cmap=cm)
     return [colourMapRGB.to_rgba(iCurve) for iCurve in range(N)]
 
-markers = ['d', 'p', 's', 'v', 'o', '8', '^', 'D', '*', 'h', '<', 'H', '>', '+']*3
-
-tickFontProperties = matplotlib.font_manager.FontProperties(family='serif',
-                      style='normal',weight='normal',size=16)
 
 def makeAxesNice(fig, ax, xlab='', ylab='', figtitle='', zlab="",
             marginL=False, marginR=False, marginT=False, marginB=False,
             xLabPad=False, yLabPad=False, zLabPad=False,
             rightAndTopBorder=False, axes3d=False):
-    """ Apply nice formatting to the given figure and axes """
     # override default for a 3D plot
     # TODO this would be much better done with **kwargs, but hey, it works
     if axes3d:
@@ -139,11 +157,12 @@ def makeAxesNice(fig, ax, xlab='', ylab='', figtitle='', zlab="",
         ax.w_yaxis._axinfo.update({'grid' : {'color': (0, 0, 0, 0.5), "linewidth": 0.5, 'linestyle': "--"}})
         ax.w_zaxis._axinfo.update({'grid' : {'color': (0, 0, 0, 0.5), "linewidth": 0.5, 'linestyle': "--"}})
 
+
+# TODO this should be deprecated
 def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], ylim=[],
             style='bw', marginL=0.125, marginR=0.96, marginT=0.91, marginB=0.16, ncol=1, figSize=None,
             fontsizeLabels=20, fontsizeTicks=16, fontsizeLegend=18, rightAndTopBorder=False,
             legbox=[], legloc="best", returnTwinAxes=False, twinYlabel='', returnCmap=False, colours=None):
-    """ Create a nice figure """
     if colours == None:
         colours = getColours(len(xArrs))
     else:
@@ -243,7 +262,6 @@ def niceFig(xArrs, yArrs, xlab='', ylab='', figtitle='', labels=[], xlim=[], yli
     return ret
 
 def addColourBar(fig, cs, cbarLabel, pos=[0.85, .25, 0.03, 0.5], fontsize=20, orientation="vertical"):
-    """ Add a nice colour bar """
     position = fig.add_axes(pos)#[0.85, .25, 0.03, 0.5])
     cbar = fig.colorbar(cs, cax=position, orientation=orientation)
 #        cbar.ax.tick_params(labelsize=16)
@@ -253,56 +271,57 @@ def addColourBar(fig, cs, cbarLabel, pos=[0.85, .25, 0.03, 0.5], fontsize=20, or
         label.set_fontproperties(tickFontProperties)
     cbar.set_label("${}$".format(cbarLabel.replace(" ", "\;")), fontsize=fontsize)
     return cbar
+"""
 
 # =======
 # module test
 
-if __name__ == "__main__":
-    import numpy as np
-    from mpl_toolkits.mplot3d import Axes3D
+# if __name__ == "__main__":
+#     import numpy as np
+#     from mpl_toolkits.mplot3d import Axes3D
 
-    # === UNIT TEST 0: 2D PLOTS ===
-    # create some data
-    x = np.linspace(0, 2*np.pi, 101)
-    y0 = np.sin(x)
-    y1 = np.sin(2.*x)
+#     # === UNIT TEST 0: 2D PLOTS ===
+#     # create some data
+#     x = np.linspace(0, 2*np.pi, 101)
+#     y0 = np.sin(x)
+#     y1 = np.sin(2.*x)
 
-    # plot black and white
-    fig, ax = niceFig([x, x], [y0, y1], "x [-]", "f(x) [-]", "Default figure")
+#     # plot black and white
+#     fig, ax = niceFig([x, x], [y0, y1], "x [-]", "f(x) [-]", "Default figure")
 
-    # plot in colour with a legend, custom margins and limits
-    fig, ax = niceFig([x, x], [y0, y1], "x [-]", "f(x) [-]", "Colourful figure", ["sin(x)", "sin(2x)"],
-            style="c", marginL=0.15, marginR=0.95, marginB=0.15, marginT=0.95)
+#     # plot in colour with a legend, custom margins and limits
+#     fig, ax = niceFig([x, x], [y0, y1], "x [-]", "f(x) [-]", "Colourful figure", ["sin(x)", "sin(2x)"],
+#             style="c", marginL=0.15, marginR=0.95, marginB=0.15, marginT=0.95)
 
-    # plot on two axes
-    fig, ax0, ax1 = niceFig([], [], "x [-]", "f(x) [-]", "Twin axes figure",
-            returnTwinAxes=True, twinYlabel="sin^2(2x)", marginR=0.875)
-    l0 = ax0.plot(x, y0, 'r-', lw=2, label=r"$sin(x)$")
-    l1 = ax1.plot(x, y1**2, 'b-', lw=2, label=r"$sin^2(2x)$")
-    legend = ax1.legend(l0+l1, [l.get_label() for l in l0+l1], loc="best", prop={"size":18})
-    legend.get_frame().set_linewidth(2)
+#     # plot on two axes
+#     fig, ax0, ax1 = niceFig([], [], "x [-]", "f(x) [-]", "Twin axes figure",
+#             returnTwinAxes=True, twinYlabel="sin^2(2x)", marginR=0.875)
+#     l0 = ax0.plot(x, y0, 'r-', lw=2, label=r"$sin(x)$")
+#     l1 = ax1.plot(x, y1**2, 'b-', lw=2, label=r"$sin^2(2x)$")
+#     legend = ax1.legend(l0+l1, [l.get_label() for l in l0+l1], loc="best", prop={"size":18})
+#     legend.get_frame().set_linewidth(2)
 
-    # === UNIT TEST 1: SURFACE PLOT ===
-    # create some data
-    x = np.linspace(0, 2*np.pi, 101)
-    y = np.linspace(-np.pi, np.pi, 101)
-    x, y = np.meshgrid(x, y)
-    z = np.sin(2.*x) * np.cos(y)
+#     # === UNIT TEST 1: SURFACE PLOT ===
+#     # create some data
+#     x = np.linspace(0, 2*np.pi, 101)
+#     y = np.linspace(-np.pi, np.pi, 101)
+#     x, y = np.meshgrid(x, y)
+#     z = np.sin(2.*x) * np.cos(y)
 
-    # prepare axes
-    fig = plt.figure(figsize=(12, 8))
-    ax = fig.add_subplot(111, projection='3d')
+#     # prepare axes
+#     fig = plt.figure(figsize=(12, 8))
+#     ax = fig.add_subplot(111, projection='3d')
 
-    # apply formatting
-    makeAxesNice(fig, ax, "x/\pi [-]", "y/\pi [-]", "3D plot", zlab="f(x,y) [-]", axes3d=True, marginR=0.8)
+#     # apply formatting
+#     makeAxesNice(fig, ax, "x/\pi [-]", "y/\pi [-]", "3D plot", zlab="f(x,y) [-]", axes3d=True, marginR=0.8)
 
-    # plot with lines
-#    ax.plot_wireframe(x/np.pi, y/np.pi, z, color="k", lw=2, rstride=5, cstride=5)
-    # plot as a coloured surface
-    cmap = plt.cm.jet
-    cs = ax.plot_surface(x/np.pi, y/np.pi, z, linewidth=1, alpha=0.75,
-                    cmap=cmap, norm=matplotlib.colors.BoundaryNorm(np.linspace(-1, 1, 25), cmap.N))
-    # add colour bar
-    cbar = addColourBar(fig, cs, "f(x,y)")
+#     # plot with lines
+# #    ax.plot_wireframe(x/np.pi, y/np.pi, z, color="k", lw=2, rstride=5, cstride=5)
+#     # plot as a coloured surface
+#     cmap = plt.cm.jet
+#     cs = ax.plot_surface(x/np.pi, y/np.pi, z, linewidth=1, alpha=0.75,
+#                     cmap=cmap, norm=matplotlib.colors.BoundaryNorm(np.linspace(-1, 1, 25), cmap.N))
+#     # add colour bar
+#     cbar = addColourBar(fig, cs, "f(x,y)")
 
-    plt.show()
+#     plt.show()

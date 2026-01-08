@@ -1,6 +1,9 @@
 import numpy as np
 import pandas
 
+# TODO move cyl to stlTools and harmonise
+# TODO add colours to obj file output of boxes to indicate ref lvl in Paraview
+
 def make_ref_cyl(x0, iHat, jHat, dx, Rout):
     kHat = np.cross(iHat, jHat)
     

@@ -10,6 +10,8 @@ This file contains a set of functions which import OpenFOAM data files and parse
 for further manipulaiton and plotting
 """
 
+raise RuntimeError("OF iO tools are super old. If you want to use them, you need to fix them first.")
+
 # Python-specific files
 import sys
 import numpy as np
