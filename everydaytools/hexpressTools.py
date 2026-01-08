@@ -80,6 +80,10 @@ class HexpressRefZones(object):
     def __init__(self):
         self.ref_boxes = []
 
+    def change_ref_levels(self, delta_level):
+        for box in self.ref_boxes:
+            box.level += delta_level
+
     def scale(self, scale_factor):
         for box in self.ref_boxes:
             box.vertices *= scale_factor
