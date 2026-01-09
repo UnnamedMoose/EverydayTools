@@ -60,6 +60,68 @@ def write_stl_list(stls, filename):
             sfile.write("endsolid\n")
 
 
+def hexpress_grid_study(grid_settings_base):
+    """ Generate settings for a series of geometrically-similar grids.
+
+    This follows the procedure described by:
+        Crepier, P., 2017. Ship resistance prediction: verification and validation exercise on unstructured grids.
+            In MARINE VII: Proceedings of the VII International Conference on Computational Methods
+            in Marine Engineering (pp. 365-376). CIMNE.
+    
+    Base settings should be a dictionary like:
+        grid_settings_base = {
+            "Nx": 18,
+            "Ny": 6,
+            "Nz": 12,
+            "Nbl": 5,
+            "dy_wall": 0.004858,
+            "bl_er": 1.439763,
+            "level": 1,
+            "diffusion": 1,
+            "Ncells": 1.328125,
+        }
+
+    Ncells is an estimate of the total no. cells but can be omitted if this is not know.
+    Refinement level and diffusion parameter should match (diff=2*level-1).
+    """
+
+    levels = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5]
+    diffs = range(1, 11, 1)
+    grid_settings = []
+    for iLvl, diff in enumerate(diffs):
+        level = levels[iLvl]
+        grid = grid_settings_base.copy()
+        grid["diffusion"] = diff
+        grid["level"] = level
+
+        diff_targer = 2*level - 1
+        if np.abs(diff - diff_targer) > 1e-6:
+            raise RuntimeError("Inconsistent diffusion level, check initial grid settings. Hint: diff=2*level-1")
+
+        if np.abs(level - 1) < 1e-6:
+            grid["Nx"] = grid["Nx"] // grid_settings_base["level"]
+            grid["Ny"] = grid["Ny"] // grid_settings_base["level"]
+            grid["Nz"] = grid["Nz"] // grid_settings_base["level"]
+            grid["Nbl"] = grid["Nbl"] // grid_settings_base["level"]
+            grid["bl_er"] = grid_settings_base["bl_er"]**grid_settings_base["level"]
+            grid["dy_wall"] = grid_settings_base["dy_wall"]*(1-grid_settings_base["bl_er"]**grid_settings_base["level"])/(1-grid_settings_base["bl_er"])
+        else:
+            grid["Nx"] = int(grid_settings[0]["Nx"]*level)
+            grid["Ny"] = int(grid_settings[0]["Ny"]*level)
+            grid["Nz"] = int(grid_settings[0]["Nz"]*level)
+            grid["Nbl"] = int(grid_settings[0]["Nbl"]*level)
+            grid["bl_er"] = grid_settings[0]["bl_er"]**(1/grid["level"])
+            grid["dy_wall"] = grid_settings[0]["dy_wall"] * (1-grid["bl_er"]) / (1-grid["bl_er"]**level)
+        
+        if "Ncells" in grid_settings_base:
+            grid["Ncells"] = grid_settings_base["Ncells"]*(level/grid_settings_base["level"])**3.
+
+        grid_settings.append(grid)
+
+    grid_settings = pandas.DataFrame(grid_settings)
+    return grid_settings
+
+
 class RefBox(object):
     def __init__(self, vertices, level, directions, volumic):
         self.faces = [
