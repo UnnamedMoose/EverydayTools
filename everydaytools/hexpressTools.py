@@ -85,6 +85,10 @@ def hexpress_grid_study(grid_settings_base):
     Refinement level and diffusion parameter should match (diff=2*level-1).
     """
 
+    diff_targer = 2*grid_settings_base["level"] - 1
+    if np.abs(grid_settings_base["diffusion"] - diff_targer) > 1e-6:
+        raise RuntimeError("Inconsistent input diffusion and refinement level, check initial grid settings. Hint: diff=2*level-1")
+
     levels = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5]
     diffs = range(1, 11, 1)
     grid_settings = []
@@ -93,10 +97,6 @@ def hexpress_grid_study(grid_settings_base):
         grid = grid_settings_base.copy()
         grid["diffusion"] = diff
         grid["level"] = level
-
-        diff_targer = 2*level - 1
-        if np.abs(diff - diff_targer) > 1e-6:
-            raise RuntimeError("Inconsistent diffusion level, check initial grid settings. Hint: diff=2*level-1")
 
         if np.abs(level - 1) < 1e-6:
             grid["Nx"] = grid["Nx"] // grid_settings_base["level"]

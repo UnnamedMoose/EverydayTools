@@ -12,13 +12,16 @@ tickFontProperties = matplotlib.font_manager.FontProperties(
 )
 
 
-def makeNiceAxes(ax, xlab=None, ylab=None):
+def makeNiceAxes(ax, xlab=None, ylab=None, yaxis_left=True):
     ax.tick_params(axis='both', reset=False, which='both', length=5, width=2)
     ax.tick_params(axis='y', direction='out', which="both")
     ax.tick_params(axis='x', direction='out', which="both")
     for spine in ['top', 'right','bottom','left']:
         ax.spines[spine].set_linewidth(2)
-    ax.spines['right'].set_visible(False)
+    if yaxis_left:
+        ax.spines['right'].set_visible(False)
+    else:
+        ax.spines['left'].set_visible(False)
     ax.spines['top'].set_visible(False)
     ax.set_xlabel(xlab)
     ax.set_ylabel(ylab)
@@ -32,6 +35,14 @@ def niceFig(xlab=None, ylab=None, figsize=None, nrows=1, ncols=1):
         for axx in ax:
             makeNiceAxes(axx, xlab, ylab)
     return fig, ax
+
+
+def niceTwinFig(xlab=None, ylab=None, ylab2=None, figsize=None):
+    fig, ax = plt.subplots(figsize=figsize)
+    ax2 = ax.twinx()
+    makeNiceAxes(ax, xlab, ylab)
+    makeNiceAxes(ax2, xlab, ylab2, yaxis_left=False)
+    return fig, ax, ax2
 
 
 def addColourBar(fig, cs, cbarLabel, pos=[0.85, 0.25, 0.03, 0.5], orientation="vertical"):

@@ -10,6 +10,7 @@ except:
 from . import nicePlots
 from . import dynamometryTools
 from . import igesTools
+from . import xmlTools
 from . import vrmlTools
 from . import hexpressTools
 from . import objTools
